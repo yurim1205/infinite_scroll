@@ -60,6 +60,10 @@ const HomePage = () => {
         })}
       </div>
       {loading && <LoadingSpinner />}
+
+      {/*ref는 ref를 div 요소에 연결하는 역할을 함*/}
+      {/* ref를 스크롤 감지할 대상 요소에 연결 */}
+      {/* div 요소가 화면에 보일 때  inView가 true로 설정됨 */}
       <div ref={ref} style={{ height: "20px" }} />
     </div>
   );
