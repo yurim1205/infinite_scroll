@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
+import { fetchPost } from "../services/api";
+import PostCard from "../components/PostCard";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const HomePage = () => {
   const [post, setPost] = useState([]);
   const [loading, setLoading] = useState(false); // 처음에는 로딩 중이 아니라 false
   const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
 
   // useInView: 스크롤을 감지하여 특정 요소가 화면에 보일 때
   // inView 값을 true로 변경함
@@ -20,9 +22,7 @@ const HomePage = () => {
 
     // 2. 데이터 요청 시작
     try {
-      const API_URL = `https://jsonplaceholder.typicode.com/posts?_page=${page}&_limit=10`;
-      const response = await fetch(API_URL);
-      const result = await response.json(); // 응답을 json형태로 변환해서 result에 저장
+      const result = await fetchPost(page);
 
       if (page > 1) {
         setPost((prev) => [...prev, ...result]);
@@ -49,14 +49,20 @@ const HomePage = () => {
     if (inView) {
       setPage((prevPage) => prevPage + 1);
     }
-  },[inView]);
+  }, [inView]);
 
   return (
     <div>
       <h1>게시글</h1>
       <div>
-        
+        {post.map((item) => {
+          return <PostCard key={item.id} post={item} />;
+        })}
       </div>
+      {loading && <LoadingSpinner />}
+      <div ref={ref} style={{ height: "20px" }} />
     </div>
   );
 };
+
+export default HomePage;
