@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 
 const HomePage = () => {
@@ -7,8 +7,12 @@ const HomePage = () => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
-  const {ref, inView} = useInView({
-    
+  // useInView: 스크롤을 감지하여 특정 요소가 화면에 보일 때
+  // inView 값을 true로 변경함
+  const { ref, inView } = useInView({
+    // false로 설정했기 때문에 요소가 화면에 보일 때마다 inView가 true로 변함
+    triggerOnce: false,
+    threshold: 1.0,
   });
 
   const fetchData = async () => {
@@ -19,9 +23,9 @@ const HomePage = () => {
       const API_URL = `https://jsonplaceholder.typicode.com/posts?_page=${page}&_limit=10`;
       const response = await fetch(API_URL);
       const result = await response.json(); // 응답을 json형태로 변환해서 result에 저장
-  
+
       if (page > 1) {
-        setPost((prev=>[...prev, ...result]));
+        setPost((prev) => [...prev, ...result]);
       } else {
         setPost(result);
       }
@@ -32,4 +36,27 @@ const HomePage = () => {
       setLoading(false); // 로딩 끝
     }
   };
+
+  // 1. inView값이 true일 때 두 번째 useEffect가 실행됨
+  //    이때 setPage 호출되고 페이지 번호 증가
+  // 2. page값이 증가하면 첫 번째 useEffect가 실행되어,
+  //    fetchData가 호출되고 새 데이터를 요청함
+  useEffect(() => {
+    fetchData();
+  }, [page]); // 페이지가 변경될 때마다 fecthData 호출
+
+  useEffect(() => {
+    if (inView) {
+      setPage((prevPage) => prevPage + 1);
+    }
+  },[inView]);
+
+  return (
+    <div>
+      <h1>게시글</h1>
+      <div>
+        
+      </div>
+    </div>
+  );
 };
